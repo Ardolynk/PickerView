@@ -154,7 +154,11 @@ public class PickerView: UIView {
     }()
     
     private var infinityRowsMultiplier: Int = 1
-    public var currentSelectedRow: Int!
+    public var currentSelectedRow: Int! {
+        didSet {
+            tableView.contentOffset.y = rowHeight * CGFloat(currentSelectedRow!)
+        }
+    }
     
     private var firstTimeOrientationChanged = true
     private var orientationChanged = false
@@ -336,6 +340,10 @@ public class PickerView: UIView {
             setup()
             setupHasBeenDone = true
         }
+    }
+    
+    public func reloadContent() {
+        tableView.reloadData();
     }
     
     private func adjustSelectionOverlayHeightConstraint() {
