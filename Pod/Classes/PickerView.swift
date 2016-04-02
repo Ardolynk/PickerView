@@ -211,7 +211,11 @@ public class PickerView: UIView {
     
     // MARK: Subviews Setup
     
-    private func setup() {
+    private func setupIfNeeded() {
+        if (setupHasBeenDone) {
+            return
+        }
+
         infinityRowsMultiplier = generateInfinityRowsMultiplier()
         
         // Setup subviews constraints and apperance
@@ -233,6 +237,8 @@ public class PickerView: UIView {
                 // Some UI Adjustments we need to do after setting UITableView data source & delegate.
                 self.configureFirstSelection()
                 self.adjustSelectionOverlayHeightConstraint()
+
+                self.setupHasBeenDone = true
             })
         }
     }
@@ -336,10 +342,7 @@ public class PickerView: UIView {
     override public func layoutSubviews() {
         super.layoutSubviews()
         
-        if !setupHasBeenDone {
-            setup()
-            setupHasBeenDone = true
-        }
+        setupIfNeeded()
     }
     
     public func reloadContent() {
@@ -398,7 +401,9 @@ public class PickerView: UIView {
             
             let indexOfSelectedRow = visibleIndexOfSelectedRow()
             tableView.setContentOffset(CGPoint(x: 0.0, y: CGFloat(indexOfSelectedRow) * rowHeight), animated: false)
-            delegate?.pickerView(self, didSelectRow: row)
+            if (setupHasBeenDone) {
+                delegate?.pickerView(self, didSelectRow: row)
+            }
         } while !(numberOfRowsByDataSource > 0 && tableView.numberOfRowsInSection(0) > 0)
     }
     
